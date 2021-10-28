@@ -8,7 +8,10 @@ dotenv.config()
 
 // router
 const authRoute = require('./router/auth')
-
+const updateUser = require('./router/updateUser')
+const alluserRoute = require('./router/users')
+//application Object
+app.use(express.json())
 //connect database
 mongoose.connect(process.env.DB, {
     useNewUrlParser:true,
@@ -21,8 +24,12 @@ mongoose.connect(process.env.DB, {
     console.log(err)
 })
 
-app.use(express.json())
+
+
 app.use('/api/auth', authRoute)
+app.use('/api/user', updateUser)
+app.use('/api/user', alluserRoute)
+
 
 
 app.listen('5000', () => {

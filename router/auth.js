@@ -4,7 +4,7 @@ const Profile = require('../models/Profile')
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const emailValidation = require('email-validator')
-
+const ValidateUser = require('./validation');
 //path or router register
 router.post('/register', async(req, res) => {
     
@@ -32,7 +32,7 @@ router.post('/register', async(req, res) => {
 
         obuUser = {
             "id":user._id,
-            "username":user.username
+            "username":user.username,
         }
 
         res.status(201)
@@ -49,12 +49,13 @@ router.post('/login', async(req ,res) => {
         Profile.findOne({ username: req.body.username}, async(err ,data) => {
             if(data){
                 //validate return boolean
-                const validate = await bcrypt.compare(req.body.password, data.password)
+                const validate = bcrypt.compare(req.body.password, data.password)
                 if(!validate)return res.status(401).json("Wrong login")
                 
                 obData = {
                     "id":data._id,
-                    "username":data.username
+                    "username":data.username,
+                    "is_active":data.is_active = true
                 }
                 res.status(200)
                 .json(obData)
@@ -64,6 +65,38 @@ router.post('/login', async(req ,res) => {
                 .json("can't find user")
             }
 
+        })
+
+    }catch(err){
+
+    }
+})
+
+router.delete("/delect/:id", async(req, res) => {
+    try{
+
+        Profile.findById(req.params.id, async(error ,data) => {
+            if(data){
+                if(!req.body.password) return res.status(400).json('undefine password')
+                const validate  = bcrypt.compare(req.body.password, data.password)
+                if(!validate) return res.status(401).json("reject password")
+                try{
+
+                    await Profile.findByIdAndDelete({_id:req.params.id})
+
+                    res.status(200)
+                    .json("delect compate")
+
+                }catch(err){
+                    res.status(400)
+                    .json("Wrrog delect user")
+                }
+              
+
+            }else{
+                res.status(401)
+                .json("can't found!")
+            }
         })
 
     }catch(err){
