@@ -5,3 +5,4 @@ npm i mongoose
 npm i dotenv
 npm i email-validator
 npm i multer
+npm i body-parser
